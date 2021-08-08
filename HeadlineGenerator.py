@@ -34,7 +34,7 @@ noun_dictionary_place = {0: "City Hall", 1: "Bank", 2: "Supermarket",
                          8: "Police Station", 9: "Zoo"}
 
 noun_dictionary_thing = {0: "Dog", 1: "Cat", 2: "Mouse", 3: "Plane", 4: "Car",
-                         5: "Bus", 6: "Company", 7: "Computer", 8: "Race"}
+                         5: "Bus", 6: "Company", 7: "Computer"}
 
 
 verb_dictionary_person = {0: "bites", 1: "abandons", 2: "accuses",
@@ -42,27 +42,35 @@ verb_dictionary_person = {0: "bites", 1: "abandons", 2: "accuses",
                           6: "sues", 7: "adopts"}
 
 verb_dictionary_place = {0: "robs", 1: "burns down", 2: "opens", 3: "closes",
-                        4: "saves", 5: "condemns", 6: "buys", 7: "sells"}
+                         4: "saves", 5: "condemns", 6: "buys", 7: "sells"}
 
+verb_dictionary_thing = {0: "returned to rightful owner",
+                         1: "catches fire, several injured",
+                         2: "survives despite long odds",
+                         3: "returns from space", 4: "saved from destruction",
+                         5: "predicts disaster", 6: "predicts success",
+                         7: "sells for record amount",
+                         8: "bought for record amount"}
 
+# Generates a random integer 1-3. Generated int determines the noun and verb
+# dictionaries that are selected to create each headline.
 def generate_headline():
-    person_place_or_thing = random.randint(1,2)
+    person_place_or_thing = random.randint(1, 3)
     if person_place_or_thing == 1:
         noun_1 = noun_dictionary_person[random.randint(0, (len(noun_dictionary_person)-1))]
         verb = verb_dictionary_person[random.randint(0, (len(verb_dictionary_person)-1))]
         noun_2 = noun_dictionary_person[random.randint(0, (len(noun_dictionary_person)-1))]
-
+        return noun_1 + " " + verb + " " + noun_2
     elif person_place_or_thing == 2:
         noun_1 = noun_dictionary_person[random.randint(0, (len(noun_dictionary_person)-1))]
         verb = verb_dictionary_place[random.randint(0, (len(verb_dictionary_place)-1))]
         noun_2 = noun_dictionary_place[random.randint(0, (len(noun_dictionary_place)-1))]
-   # else:
-       # noun_1 = noun_dictionary_thing[random.randint(0, (len(noun_dictionary_thing)-1))]
-       # verb = verb_dictionary_person[random.randint(0, (len(verb_dictionary_person)-1))]
+        return noun_1 + " " + verb + " " + noun_2
+    else:
+        noun_1 = noun_dictionary_thing[random.randint(0, (len(noun_dictionary_thing)-1))]
+        verb = verb_dictionary_thing[random.randint(0, (len(verb_dictionary_thing)-1))]
+        return noun_1 + " " + verb
 
-
-
-    return noun_1 + " " + verb + " " + noun_2
 
 def generate_noun():
     noun = noun_dictionary_all[random.randint(0, (len(noun_dictionary_all.keys())-1))]

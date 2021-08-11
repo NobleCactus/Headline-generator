@@ -4,6 +4,13 @@
 # Headline Generator
 
 import random
+import json
+import requests
+
+header = "Headline Generator"
+intro = "Welcome to the Headline Generator app! Simply click the" \
+        " 'Generate Headline' button to have a headline appear next to the" \
+        "button. Clicking the button again will replace the existing headline"
 
 # Complete list of nouns for the noun generator
 noun_dictionary_all = {0: "Man", 1: "Woman", 2: "Child", 3: "Mayor",
@@ -52,6 +59,8 @@ verb_dictionary_thing = {0: "returned to rightful owner",
                          7: "sells for record amount",
                          8: "bought for record amount"}
 
+headline = None
+
 # Generates a random integer 1-3. Generated int determines the noun and verb
 # dictionaries that are selected to create each headline.
 def generate_headline():
@@ -60,16 +69,19 @@ def generate_headline():
         noun_1 = noun_dictionary_person[random.randint(0, (len(noun_dictionary_person)-1))]
         verb = verb_dictionary_person[random.randint(0, (len(verb_dictionary_person)-1))]
         noun_2 = noun_dictionary_person[random.randint(0, (len(noun_dictionary_person)-1))]
-        return noun_1 + " " + verb + " " + noun_2
+        headline = noun_1 + " " + verb + " " + noun_2
+        return headline
     elif person_place_or_thing == 2:
         noun_1 = noun_dictionary_person[random.randint(0, (len(noun_dictionary_person)-1))]
         verb = verb_dictionary_place[random.randint(0, (len(verb_dictionary_place)-1))]
         noun_2 = noun_dictionary_place[random.randint(0, (len(noun_dictionary_place)-1))]
-        return noun_1 + " " + verb + " " + noun_2
+        headline = noun_1 + " " + verb + " " + noun_2
+        return headline
     else:
         noun_1 = noun_dictionary_thing[random.randint(0, (len(noun_dictionary_thing)-1))]
         verb = verb_dictionary_thing[random.randint(0, (len(verb_dictionary_thing)-1))]
-        return noun_1 + " " + verb
+        headline = noun_1 + " " + verb
+        return headline
 
 
 def generate_noun():
@@ -80,6 +92,12 @@ def generate_verb():
     verb = verb_dictionary_all[random.randint(0, (len(verb_dictionary_all.keys())-1))]
     return verb
 
+def call_anagram(headline):
+    payload = {"text": headline}
+    response = requests.get("", params=payload)
+    text_response = response.text
+    return
+
 import PySimpleGUI as sg
 
 margins = (100, 100)
@@ -87,28 +105,34 @@ sz = (10, 10)
 
 gen_headline_button = sg.B("Click here to generate a headline!", size=(25,0))
 gen_headline_out = sg.T("Generated headline will appear here!", pad=(50,0), key="hl")
+previous_headline = sg.B("<--", size=(3,0), key="prev_hl")
 gen_noun_button = sg.B("Click here to generate a noun!", size=(25,0))
 gen_noun_out = sg.T("Generated noun will appear here!", pad=(50,0), key="noun")
+previous_noun = sg.B("<--", size=(3,0), key="prev_noun")
 gen_verb_button = sg.B("Click here to generate a verb!", size=(25,0))
 gen_verb_out = sg.T("Generated verb will appear here!", pad=(50,0), key="verb")
+previous_verb = sg.B("<--", size=(3,0), key="prev_verb")
 gen_anagram_button = sg.B("Click here to generate an anagram!", size=(25,0))
 gen_anagram_out = sg.T("Generated anagram will appear here!", pad=(50,0), key="ana")
-layout = [[gen_headline_button, gen_headline_out], [gen_noun_button, gen_noun_out],
-          [gen_verb_button, gen_verb_out], [gen_anagram_button, gen_anagram_out]],\
+layout = [[sg.T(header, justification="c", pad=(225,0),)], [sg.T(intro, size=(75,0), justification='c')],
+         [previous_headline, gen_headline_button, gen_headline_out],
+         [previous_noun, gen_noun_button, gen_noun_out],
+         [previous_verb, gen_verb_button, gen_verb_out], [gen_anagram_button, gen_anagram_out]],\
          [sg.Multiline(size=(75,20))],[sg.B("Exit Program")]
 
 
 window = sg.Window("Headline Generator", layout, margins=margins)
 while True:
     event, values = window.read()
-    gen_headline_out = sg.T("Horse")
-
     if event == "Click here to generate a headline!":
         window["hl"].update(generate_headline())
+        headline = (window["hl"].get())
     elif event == "Click here to generate a noun!":
         window["noun"].update(generate_noun())
     elif event == "Click here to generate a verb!":
         window["verb"].update(generate_verb())
+    elif event == "Click here to generate an anagram!":
+        call_anagram(headline)
     elif event == "Exit Program":
         break
     elif event == sg.WIN_CLOSED:

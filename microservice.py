@@ -4,7 +4,7 @@
 # Headline Generator
 
 import random
-import requests
+from flask import Flask
 
 header = "Headline Generator"
 intro = "Welcome to the Headline Generator app! Simply click the" \
@@ -59,3 +59,42 @@ verb_dictionary_thing = {0: "returned to rightful owner",
                          5: "predicts disaster", 6: "predicts success",
                          7: "sells for record amount",
                          8: "bought for record amount"}
+
+def generate_headline():
+    person_place_or_thing = random.randint(1, 3)
+    if person_place_or_thing == 1:
+        noun_1 = noun_dictionary_person[random.randint(0, (len(noun_dictionary_person)-1))]
+        verb = verb_dictionary_person[random.randint(0, (len(verb_dictionary_person)-1))]
+        noun_2 = noun_dictionary_person[random.randint(0, (len(noun_dictionary_person)-1))]
+        headline = noun_1 + " " + verb + " " + noun_2
+        return headline
+    elif person_place_or_thing == 2:
+        noun_1 = noun_dictionary_person[random.randint(0, (len(noun_dictionary_person)-1))]
+        verb = verb_dictionary_place[random.randint(0, (len(verb_dictionary_place)-1))]
+        noun_2 = noun_dictionary_place[random.randint(0, (len(noun_dictionary_place)-1))]
+        headline = noun_1 + " " + verb + " " + noun_2
+        return headline
+    else:
+        noun_1 = noun_dictionary_thing[random.randint(0, (len(noun_dictionary_thing)-1))]
+        verb = verb_dictionary_thing[random.randint(0, (len(verb_dictionary_thing)-1))]
+        headline = noun_1 + " " + verb
+        return headline
+
+def generate_noun():
+    noun = noun_dictionary_all[random.randint(0, (len(noun_dictionary_all.keys())-1))]
+    return noun
+
+def generate_verb():
+    verb = verb_dictionary_all[random.randint(0, (len(verb_dictionary_all.keys())-1))]
+    return verb
+
+app = Flask(__name__)
+
+@app.route('/')
+    def homepage():
+    return ""
+    <h1>Hello heroku</h1>
+
+
+if __name__ == '__main__':
+    app.run(debug=True, use_reloader=True)

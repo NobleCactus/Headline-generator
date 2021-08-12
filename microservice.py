@@ -3,17 +3,11 @@
 # Summer 2021
 # Headline Generator
 
-import random
 from flask import Flask
+import random
+app = Flask(__name__)
 
-header = "Headline Generator"
-intro = "Welcome to the Headline Generator app! Simply click the" \
-        " 'Generate Headline' button to have a headline appear next to the" \
-        "button. Clicking the button again will replace the existing headline," \
-        "but you can revert to the previous headline by clicking the <--" \
-        "buttons next to the generate buttons."
 
-# Complete list of nouns for the noun generator
 noun_dictionary_all = {0: "Man", 1: "Woman", 2: "Child", 3: "Mayor",
                     4: "Policeman", 5: "Firefighter", 6: "Doctor", 7: "Lawyer",
                     8: "Teacher", 9: "Husband", 10: "Wife", 11: "City Hall",
@@ -88,13 +82,19 @@ def generate_verb():
     verb = verb_dictionary_all[random.randint(0, (len(verb_dictionary_all.keys())-1))]
     return verb
 
-app = Flask(__name__)
+@app.route('/noun', methods=['GET'])
+def respond():
+    return generate_noun()
 
-@app.route('/')
-    def homepage():
-    return ""
-    <h1>Hello heroku</h1>
+@app.route('/verb', methods=['GET'])
+def verb_response():
+       return generate_verb()
 
+@app.route('/', methods=['GET'])
+def headline_response():
+    horse = "HORSE"
+    return generate_headline()
 
 if __name__ == '__main__':
-    app.run(debug=True, use_reloader=True)
+    # Threaded option to enable multiple instances for multiple user access support
+    app.run()

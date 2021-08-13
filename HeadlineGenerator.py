@@ -4,13 +4,16 @@
 # Headline Generator
 
 import random
-import json
 import requests
 
 header = "Headline Generator"
 intro = "Welcome to the Headline Generator app! Simply click the" \
         " 'Generate Headline' button to have a headline appear next to the" \
-        "button. Clicking the button again will replace the existing headline"
+        "button. Clicking the button again will replace the existing headline," \
+        "but you can revert to the previous headline by clicking the <--" \
+        "buttons next to the generate buttons. Keep in mind that you can only" \
+        "revert to the MOST RECENT headline, noun, or verb, you cannot revert" \
+        "back farther than that."
 
 # Complete list of nouns for the noun generator
 noun_dictionary_all = {0: "Man", 1: "Woman", 2: "Child", 3: "Mayor",
@@ -59,7 +62,11 @@ verb_dictionary_thing = {0: "returned to rightful owner",
                          7: "sells for record amount",
                          8: "bought for record amount"}
 
+# All are set to None to facilitate the previous button mechanics.
 headline = None
+prev_headline = None
+prev_noun = None
+prev_verb = None
 
 # Generates a random integer 1-3. Generated int determines the noun and verb
 # dictionaries that are selected to create each headline.
@@ -94,15 +101,15 @@ def generate_verb():
 
 def call_anagram(headline):
     payload = {"text": headline}
-    response = requests.get("", params=payload)
+    response = requests.get("https://fathomless-eyrie-81701.herokuapp.com/", params=payload)
     text_response = response.text
-    return
+    return print(text_response)
 
 import PySimpleGUI as sg
 
 margins = (100, 100)
-sz = (10, 10)
 
+# Code below is used for the layout of the GUI.
 gen_headline_button = sg.B("Click here to generate a headline!", size=(25,0))
 gen_headline_out = sg.T("Generated headline will appear here!", pad=(50,0), key="hl")
 previous_headline = sg.B("<--", size=(3,0), key="prev_hl")
@@ -114,6 +121,7 @@ gen_verb_out = sg.T("Generated verb will appear here!", pad=(50,0), key="verb")
 previous_verb = sg.B("<--", size=(3,0), key="prev_verb")
 gen_anagram_button = sg.B("Click here to generate an anagram!", size=(25,0))
 gen_anagram_out = sg.T("Generated anagram will appear here!", pad=(50,0), key="ana")
+
 layout = [[sg.T(header, justification="c", pad=(225,0),)], [sg.T(intro, size=(75,0), justification='c')],
          [previous_headline, gen_headline_button, gen_headline_out],
          [previous_noun, gen_noun_button, gen_noun_out],
@@ -125,14 +133,44 @@ window = sg.Window("Headline Generator", layout, margins=margins)
 while True:
     event, values = window.read()
     if event == "Click here to generate a headline!":
-        window["hl"].update(generate_headline())
-        headline = (window["hl"].get())
+        if prev_headline == None:
+            window["hl"].update(generate_headline())
+            headline = window["hl"].get()
+            prev_headline = window["hl"].get()
+        else:
+            prev_headline = window["hl"].get()
+            window["hl"].update(generate_headline())
+            headline = window["hl"].get()
+
     elif event == "Click here to generate a noun!":
-        window["noun"].update(generate_noun())
+        if prev_noun == None:
+            window["noun"].update(generate_noun())
+            prev_noun = window["noun"].get()
+        else:
+            prev_noun = window["noun"].get()
+            window["noun"].update(generate_noun())
+
     elif event == "Click here to generate a verb!":
-        window["verb"].update(generate_verb())
+        if prev_verb == None:
+            window["verb"].update(generate_verb())
+            prev_verb = window["verb"].get()
+        else:
+            prev_verb = window["verb"].get()
+            window["verb"].update(generate_verb())
+
+
     elif event == "Click here to generate an anagram!":
         call_anagram(headline)
+
+#Previous button GUI update mechanics.
+    elif event == "prev_hl":
+        window["hl"].update(prev_headline)
+    elif event == "prev_noun":
+        window["noun"].update(prev_noun)
+    elif event == "prev_verb":
+        window["verb"].update(prev_verb)
+
+#Exit and "x" buttons will close the GUI without an error.
     elif event == "Exit Program":
         break
     elif event == sg.WIN_CLOSED:

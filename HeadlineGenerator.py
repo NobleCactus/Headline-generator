@@ -13,7 +13,10 @@ intro = "Welcome to the Headline Generator app! Simply click the" \
         "but you can revert to the previous headline by clicking the <--" \
         "buttons next to the generate buttons. Keep in mind that you can only" \
         "revert to the MOST RECENT headline, noun, or verb, you cannot revert" \
-        "back farther than that."
+        "back farther than that. The 'Generate Anagram' button will use an " \
+        "anagram generator to try and get an anagram for each word in the" \
+        "currently generated headline. It will display 'No anagram available'" \
+        "if no anagram exists for any word in the headline"
 
 # Complete list of nouns for the noun generator
 noun_dictionary_all = {0: "Man", 1: "Woman", 2: "Child", 3: "Mayor",
@@ -100,10 +103,22 @@ def generate_verb():
     return verb
 
 def call_anagram(headline):
-    payload = {"text": headline}
-    response = requests.get("https://fathomless-eyrie-81701.herokuapp.com/", params=payload)
-    text_response = response.text
-    return print(text_response)
+    if headline == None:
+        return "Generate a headline first!"
+    headline_words = headline.split(" ")
+    out = ''
+    for word in headline_words:
+        payload = {"text": headline}
+        URL = "http://flip3.engr.oregonstate.edu:3480/search/"
+        URL += word
+        response = requests.get(URL, params=payload)
+        text_response = response.text
+        out += text_response + " "
+    out = out[0:-1]
+    print(out)
+    if out == headline.lower():
+        out = 'No anagram available for this headline. Sorry!'
+    return out
 
 import PySimpleGUI as sg
 
@@ -120,7 +135,7 @@ gen_verb_button = sg.B("Click here to generate a verb!", size=(25,0))
 gen_verb_out = sg.T("Generated verb will appear here!", pad=(50,0), key="verb")
 previous_verb = sg.B("<--", size=(3,0), key="prev_verb")
 gen_anagram_button = sg.B("Click here to generate an anagram!", size=(25,0))
-gen_anagram_out = sg.T("Generated anagram will appear here!", pad=(50,0), key="ana")
+gen_anagram_out = sg.T("Generated anagram will appear here!", pad=(93,0), key="ana")
 
 layout = [[sg.T(header, justification="c", pad=(225,0),)], [sg.T(intro, size=(75,0), justification='c')],
          [previous_headline, gen_headline_button, gen_headline_out],
@@ -160,7 +175,7 @@ while True:
 
 
     elif event == "Click here to generate an anagram!":
-        call_anagram(headline)
+        window["ana"].update(call_anagram(headline))
 
 #Previous button GUI update mechanics.
     elif event == "prev_hl":
